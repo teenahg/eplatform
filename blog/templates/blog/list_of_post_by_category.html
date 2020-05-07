@@ -1,0 +1,34 @@
+{% extends 'blog/base.html' %}
+{% block title %}
+<form method="GET" action="{% url 'search' %}" class="mb-1">
+    <div class="card-body">
+      <div class="input-group">
+        <input type="text" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="Search ...">
+        <span class="input-group-btn" >
+          &nbsp;
+          <button class="btn btn-success" type="button">Search</button>
+        </span>
+      </div>
+    </div>
+</form>
+{% endblock title %}
+
+{% block content %}
+<h4 class="text-muted">{{ category.name }} Posts</h4>
+<hr>
+<div class="content-section">
+    {% for posts in post %}
+    <b><a class="article-title" href="{{posts.get_absolute_url}}">{{ posts.title }}</a></b>
+    <hr>
+    {% endfor %}
+</div>
+{% endblock content %}
+   <!-- <h4>{{ posts.title }}</h4> -->
+        <!-- <h5>
+            <a href="{{posts.get_absolute_url}}" class="article-title">
+                {{ posts.title }}
+            </a>
+        </h5>
+        <p class="article-metadata article-content">
+                {{ posts.content|truncatewords:40|linebreaks }}
+            </p> -->

@@ -1,0 +1,87 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block content %}
+    {% if user.is_authenticated %} <!-- authenticating current user -->
+    <form method="GET" action="{% url 'search' %}" class="mb-1">
+          <div class="card-body">
+            <div class="input-group">
+              <input type="text" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="Search ...">
+              <span class="input-group-btn" >
+                &nbsp;
+                <button class="btn btn-success" type="button">Search</button>
+              </span>
+            </div>
+          </div>
+    </form>
+        {% for post in posts %} <!-- looping over available posts -->
+        &nbsp;
+            <article class="media content-section" style="font-size: 14px">
+                <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+                <div class="media-body">
+                    <div class="article-metadata text-muted">
+                        By
+                        <a href="{% url 'user-posts' post.author.username %}">
+                            {{ post.author }}
+                        </a>
+                        on {{ post.date_posted|date:"F d, Y" }} in
+                            <a href="{{ post.category.get_absolute_url }}">
+                                {{ post.category }}
+                            </a>
+                    </div>
+                    <b><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></b>
+                    <p class="article-content">{{ post.content|truncatechars:200 }}</p>
+                    <hr>
+                    {% if post.approved_comments.count == 1 %}
+                    <a href="{% url 'post-detail' pk=post.pk %}" class="text-muted" style="text-decoration: none;">{{ post.approved_comments.count }} comment</a>
+                    {% elif post.approved_comments.count > 1 %}
+                    <a href="{% url 'post-detail' pk=post.pk %}" class="text-muted" style="text-decoration: none;">{{ post.approved_comments.count }} comments</a>
+                    {% elif post.approved_comments.count == 0 %}
+                    <a href="{% url 'post-detail' pk=post.pk %}" class="text-muted" style="text-decoration: none;">No comments yet</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %} <!-- end of loop -->
+        
+        &nbsp;
+
+        <center>
+            {% if is_paginated %} <!-- page numbering -->
+            {% if page_obj.has_previous %} <!-- checking for previous page -->
+                <a href="?page=1" class="btn btn-outline-info btn-sm mb-4" style="font-size: 14px">First</a>
+                <a href="{{ page_obj.previous_page_number }}" class="btn btn-outline-info btn-sm mb-4" style="font-size: 14px">Previous</a>
+            {% endif %} <!-- end of check for previous number -->
+
+            {% for num in page_obj.paginator.page_range %} <!-- looping over all page numbers -->
+                {% if page_obj.number == num %} <!-- checking if current page = page number -->
+                    <a href="?page={{ num }}" class="btn btn-info btn-sm mb-4">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <!-- second condition -->
+                    <a href="?page={{ num }}" class="btn btn-outline-info btn-sm mb-4">{{ num }}</a>
+                {% endif %} <!-- end checking if current page = page number -->
+            {% endfor %} <!-- looping over all page numbers -->
+            {% if page_obj.has_next %} <!-- checking for next page -->
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-info btn-sm mb-4">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info btn-sm mb-4">Last</a>
+            {% endif %} <!-- end checking for next page -->
+        {% endif %} <!-- end page numbering -->
+        </center>
+
+        {% else %}
+        <footer class="mb-0">
+                <center>
+                    <div class="content-section">
+                        <img src="{% static 'img/elearner large.png' %}" alt="">
+                        <p class="text-muted">Collaborate with your peers from across the globe <br> and share educational resources for free.</p>
+                        <p class="text-muted">
+                            <hr>
+                            <b>create.connect.learn</b>
+                            <p class="text-muted">
+                                &copy;Copyright eLearner 2020. All rights reserved&period;
+                            </p>
+                        </p>
+
+                    </div>
+                    </center>
+        </footer>
+            
+    {% endif %}
+{% endblock content %}

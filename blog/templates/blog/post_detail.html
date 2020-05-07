@@ -1,0 +1,45 @@
+{% extends "blog/base.html" %}
+{% block content %}
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'user-posts' object.author.username %}">{{ object.author }}</a>
+                    <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+                    {% if object.author == user %}
+                    <div>
+                        <a href="{% url 'post-update' object.id %}" class="btn btn-success btn-sm mt-1 mb-1">Update</a>
+                        <a href="{% url 'post-delete' object.id %}" class="btn btn-danger btn-sm mt-1 mb-1">Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <h2 class="article-title">{{ object.title }}</h2>
+                <p class="article-content">{{ object.content }}</p>
+            </div>
+        </article>
+        <hr>
+        <a class="btn btn-outline-info btn-sm" href="{% url 'add_comment_to_post' pk=post.pk %}">Add comment</a>
+        <br>
+        &nbsp;
+{% for comment in post.comments.all %}
+{% if user.is_authenticated or comment.approved_comment %}
+<div class="comment">
+    <div class="content-section">
+        <strong>{{ comment.author }}</strong>
+        <hr>
+        <p>{{ comment.text|linebreaks }}</p>
+        <div class="date">
+        {{ comment.created_date }}
+        {% if not comment.approved_comment %}
+            &nbsp;
+            <a class="text-muted" href="{% url 'comment_approve' pk=comment.pk %}">Approve</a>
+            <a class="text-muted" href="{% url 'comment_remove' pk=comment.pk %}">Remove</a>
+        {% endif %}
+    </div>
+    </div>
+</div>
+{% endif %}
+    {% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %}
+{% endblock content %}
